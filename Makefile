@@ -11,5 +11,8 @@ lint: ## Check code formatting and lint rules
 	uv run ruff format --check .
 	uv run ruff check .
 
-bulk-test: ## Run bulk tests
+bulk-test: format ## Run bulk tests
 	uv run scripts/bulk_test.py
+
+judge: format ## Run homework 3 judge
+	uv run homeworks/hw3/scripts/simple_judge.py
