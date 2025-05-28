@@ -263,3 +263,33 @@ Below are initial open-coding labels for the first eight interaction traces from
    - Safety Adaptation – uses large mozzarella balls to reduce choking hazards
    - Meets Constraints – Italian vegetarian snack
    - Persona Boilerplate – present
+
+## 2.3 Axial Coding & Taxonomy Definition
+
+### Failure Mode: Missing Response Content
+**Definition:** Bot provides only persona or placeholder text but omits the requested recipe details.
+**Illustrative Examples:**
+- Trace 78: User asked for fully cooked keto Japanese snacks, but bot only returned "I am a recipe bot..." with no recipe content.
+
+### Failure Mode: Safety Requirement Ignored
+**Definition:** Bot fails to adhere to explicit safety constraints or warnings specified by the user.
+**Illustrative Examples:**
+- Trace 77: Suggested crispy chips for an autistic child who stuffs food, posing a choking hazard.
+- Trace 73: No safety guidance when recommending keto Italian snacks.
+
+### Failure Mode: Dietary Constraint Violation
+**Definition:** Bot recommends ingredients or dishes that contradict the user's stated dietary restrictions or allergies.
+**Illustrative Examples:**
+- Trace 80: Provided an egg-based Mexican breakfast despite the user's egg allergy.
+
+### Failure Mode: Lack of Demographic Adaptation
+**Definition:** Bot does not customize recipe instructions or safety guidance for specific user demographics (e.g., children, elderly).
+**Illustrative Examples:**
+- Trace 64: Omitted child-safety advice for a toddler-friendly keto Italian dinner.
+- Trace 63: No texture or swallowing guidance for elderly parents needing gluten-free Japanese dinner.
+
+### Failure Mode: Inconsistent Persona Intro
+**Definition:** Bot inconsistently includes or omits its persona introduction, leading to unpredictable interactions.
+**Illustrative Examples:**
+- Trace 64: Response started without the usual "I am a recipe bot..." preamble.
+- Trace 71: Response began directly, omitting the persona statement.
