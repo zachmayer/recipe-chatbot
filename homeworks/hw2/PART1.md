@@ -287,9 +287,3 @@ Below are initial open-coding labels for the first eight interaction traces from
 **Illustrative Examples:**
 - Trace 64: Omitted child-safety advice for a toddler-friendly keto Italian dinner.
 - Trace 63: No texture or swallowing guidance for elderly parents needing gluten-free Japanese dinner.
-
-### Failure Mode: Inconsistent Persona Intro
-**Definition:** Bot inconsistently includes or omits its persona introduction, leading to unpredictable interactions.
-**Illustrative Examples:**
-- Trace 64: Response started without the usual "I am a recipe bot..." preamble.
-- Trace 71: Response began directly, omitting the persona statement.
