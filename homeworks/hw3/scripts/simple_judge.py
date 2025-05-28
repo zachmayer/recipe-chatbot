@@ -81,27 +81,27 @@ def predict(row) -> int:
 
 
 # 4. Run judge on dev split
-true_labels = [1 if lab.upper() == "PASS" else 0 for lab in dev_rows["label"]]
-pred_labels = [predict(row) for _, row in dev_rows.iterrows()]
+dev_true = [1 if lab.upper() == "PASS" else 0 for lab in dev_rows["label"]]
+dev_pred = [predict(row) for _, row in dev_rows.iterrows()]
 
-# 5. Compute TPR / TNR
-positives = [idx for idx, t in enumerate(true_labels) if t == 1]
-negatives = [idx for idx, t in enumerate(true_labels) if t == 0]
+# 5. Run judge on test split
+test_rows = all_rows.iloc[dev_end:]
+test_true = [1 if lab.upper() == "PASS" else 0 for lab in test_rows["label"]]
+test_pred = [predict(row) for _, row in test_rows.iterrows()]
 
-true_pos = sum(1 for i in positives if pred_labels[i] == 1)
-true_neg = sum(1 for i in negatives if pred_labels[i] == 0)
 
-tpr = true_pos / len(positives) if positives else 0.0
-tnr = true_neg / len(negatives) if negatives else 0.0
+def compute_rates(true_labels: list[int], pred_labels: list[int]):
+    positives = [i for i, t in enumerate(true_labels) if t == 1]
+    negatives = [i for i, t in enumerate(true_labels) if t == 0]
+    true_pos = sum(1 for i in positives if pred_labels[i] == 1)
+    true_neg = sum(1 for i in negatives if pred_labels[i] == 0)
+    tpr_val = true_pos / len(positives) if positives else 0.0
+    tnr_val = true_neg / len(negatives) if negatives else 0.0
+    return tpr_val, tnr_val
 
-print(f"TPR: {tpr:.3f}")
-print(f"TNR: {tnr:.3f}")
 
-# Print misclassified cases
-records = dev_rows.to_dict("records")
-for idx, (row, true, pred) in enumerate(zip(records, true_labels, pred_labels)):
-    if true != pred:
-        print(f"Case {idx}: trace_id={row['trace_id']}, query_id={row['query_id']}, true={true}, pred={pred}")
-        print(f"  Query: {row['query']}")
-        print(f"  Restriction: {row['dietary_restriction']}")
-        print("---")
+dev_tpr, dev_tnr = compute_rates(dev_true, dev_pred)
+test_tpr, test_tnr = compute_rates(test_true, test_pred)
+
+print(f"DEV - TPR: {dev_tpr:.3f}, TNR: {dev_tnr:.3f}")
+print(f"TEST - TPR: {test_tpr:.3f}, TNR: {test_tnr:.3f}")

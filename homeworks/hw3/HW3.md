@@ -20,7 +20,8 @@ TPR: 0.742
 TNR: 1.000
 
 ### Test
-
+DEV - TPR: 0.677, TNR: 1.000
+TEST - TPR: 0.786, TNR: 1.000
 
 ## Step 5
 
