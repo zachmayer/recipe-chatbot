@@ -1,0 +1,41 @@
+[project]
+name            = "recipe-chatbot"
+version         = "0.1.0"
+description     = "Sample application used as part of the AI Evals course"
+readme          = "README.md"
+requires-python = ">=3.12"          # or keep 3.13 if intentional
+dependencies = [
+    "fastapi>=0.115.12",
+    "httpx>=0.28.1",
+    "litellm>=1.70.2",
+    "pandas>=2.2.3",
+    "python-dotenv>=1.1.0",
+    "rich>=14.0.0",
+    "uvicorn>=0.34.2",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.11",
+]
+
+# --------------------------------------------------------------------
+# Ruff (modern unified config)
+# --------------------------------------------------------------------
+[tool.ruff]
+target-version = "py312"            # match the line above
+line-length    = 88                 # Black default
+
+[tool.ruff.format]                  # Black-style formatter
+quote-style  = "double"
+indent-style = "space"
+
+[tool.ruff.lint]
+select   = ["E", "F", "W", "I", "UP", "NPY"]  # style, imports, pyupgrade, numpy
+fixable  = ["ALL"]
+
+# isort-style import sorting
+[tool.ruff.lint.isort]
+combine-as-imports         = true
+force-sort-within-sections = true
+known-first-party          = ["recipe_chatbot"]  # adjust if your package name differs
