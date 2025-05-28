@@ -45,9 +45,7 @@ def evaluate_single_trace(args: tuple) -> dict[str, Any]:
 
     # Format the prompt using string replacement
     formatted_prompt = judge_prompt.replace("__QUERY__", query)
-    formatted_prompt = formatted_prompt.replace(
-        "__DIETARY_RESTRICTION__", dietary_restriction
-    )
+    formatted_prompt = formatted_prompt.replace("__DIETARY_RESTRICTION__", dietary_restriction)
     formatted_prompt = formatted_prompt.replace("__RESPONSE__", response)
 
     try:
@@ -108,9 +106,7 @@ def evaluate_judge_on_test(
 ) -> tuple[float, float, list[dict[str, Any]]]:
     """Evaluate the judge prompt on the test set using parallel processing."""
 
-    console.print(
-        f"[yellow]Evaluating judge on {len(test_traces)} test traces with {max_workers} workers..."
-    )
+    console.print(f"[yellow]Evaluating judge on {len(test_traces)} test traces with {max_workers} workers...")
 
     # Prepare tasks for parallel processing
     tasks = [(trace, judge_prompt) for trace in test_traces]
@@ -120,9 +116,7 @@ def evaluate_judge_on_test(
     # Use ThreadPoolExecutor for parallel evaluation
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all tasks
-        future_to_task = {
-            executor.submit(evaluate_single_trace, task): task for task in tasks
-        }
+        future_to_task = {executor.submit(evaluate_single_trace, task): task for task in tasks}
 
         # Process completed tasks with progress tracking
         with console.status("[yellow]Evaluating traces in parallel...") as status:
@@ -139,33 +133,15 @@ def evaluate_judge_on_test(
                         f"[yellow]Warning: Failed to evaluate trace {result['trace_id']}: {result.get('reasoning', 'Unknown error')}"
                     )
 
-                status.update(
-                    f"[yellow]Evaluated {completed}/{total} traces ({completed / total * 100:.1f}%)"
-                )
+                status.update(f"[yellow]Evaluated {completed}/{total} traces ({completed / total * 100:.1f}%)")
 
     console.print(f"[green]Completed parallel evaluation of {len(predictions)} traces")
 
     # Calculate TPR and TNR
-    tp = sum(
-        1
-        for p in predictions
-        if p["true_label"] == "PASS" and p["predicted_label"] == "PASS"
-    )
-    fn = sum(
-        1
-        for p in predictions
-        if p["true_label"] == "PASS" and p["predicted_label"] == "FAIL"
-    )
-    tn = sum(
-        1
-        for p in predictions
-        if p["true_label"] == "FAIL" and p["predicted_label"] == "FAIL"
-    )
-    fp = sum(
-        1
-        for p in predictions
-        if p["true_label"] == "FAIL" and p["predicted_label"] == "PASS"
-    )
+    tp = sum(1 for p in predictions if p["true_label"] == "PASS" and p["predicted_label"] == "PASS")
+    fn = sum(1 for p in predictions if p["true_label"] == "PASS" and p["predicted_label"] == "FAIL")
+    tn = sum(1 for p in predictions if p["true_label"] == "FAIL" and p["predicted_label"] == "FAIL")
+    fp = sum(1 for p in predictions if p["true_label"] == "FAIL" and p["predicted_label"] == "PASS")
 
     tpr = tp / (tp + fn) if (tp + fn) > 0 else 0.0
     tnr = tn / (tn + fp) if (tn + fp) > 0 else 0.0
@@ -177,43 +153,29 @@ def analyze_errors(predictions: list[dict[str, Any]]) -> None:
     """Analyze prediction errors to understand judge performance."""
 
     # False positives (predicted PASS but actually FAIL)
-    false_positives = [
-        p
-        for p in predictions
-        if p["true_label"] == "FAIL" and p["predicted_label"] == "PASS"
-    ]
+    false_positives = [p for p in predictions if p["true_label"] == "FAIL" and p["predicted_label"] == "PASS"]
 
     # False negatives (predicted FAIL but actually PASS)
-    false_negatives = [
-        p
-        for p in predictions
-        if p["true_label"] == "PASS" and p["predicted_label"] == "FAIL"
-    ]
+    false_negatives = [p for p in predictions if p["true_label"] == "PASS" and p["predicted_label"] == "FAIL"]
 
     console.print("\n[bold]Error Analysis:")
     console.print(f"False Positives: {len(false_positives)}")
     console.print(f"False Negatives: {len(false_negatives)}")
 
     if false_positives:
-        console.print(
-            "\n[red]Sample False Positives (Judge said PASS, should be FAIL):"
-        )
+        console.print("\n[red]Sample False Positives (Judge said PASS, should be FAIL):")
         for i, fp in enumerate(false_positives[:3], 1):
             console.print(f"{i}. {fp['dietary_restriction']}: {fp['query']}")
             console.print(f"   Reasoning: {fp['reasoning'][:100]}...")
 
     if false_negatives:
-        console.print(
-            "\n[yellow]Sample False Negatives (Judge said FAIL, should be PASS):"
-        )
+        console.print("\n[yellow]Sample False Negatives (Judge said FAIL, should be PASS):")
         for i, fn in enumerate(false_negatives[:3], 1):
             console.print(f"{i}. {fn['dietary_restriction']}: {fn['query']}")
             console.print(f"   Reasoning: {fn['reasoning'][:100]}...")
 
 
-def save_results(
-    tpr: float, tnr: float, predictions: list[dict[str, Any]], results_dir: Path
-) -> None:
+def save_results(tpr: float, tnr: float, predictions: list[dict[str, Any]], results_dir: Path) -> None:
     """Save evaluation results."""
 
     # Save performance metrics
@@ -223,13 +185,8 @@ def save_results(
             "true_negative_rate": tnr,
             "balanced_accuracy": (tpr + tnr) / 2,
             "total_predictions": len(predictions),
-            "correct_predictions": sum(
-                1 for p in predictions if p["true_label"] == p["predicted_label"]
-            ),
-            "accuracy": sum(
-                1 for p in predictions if p["true_label"] == p["predicted_label"]
-            )
-            / len(predictions),
+            "correct_predictions": sum(1 for p in predictions if p["true_label"] == p["predicted_label"]),
+            "accuracy": sum(1 for p in predictions if p["true_label"] == p["predicted_label"]) / len(predictions),
         }
     }
 
@@ -311,9 +268,7 @@ def main():
     save_results(tpr, tnr, predictions, results_dir)
 
     console.print("\n[bold green]Test set evaluation completed!")
-    console.print(
-        "[blue]Results saved for use with judgy in the final evaluation step."
-    )
+    console.print("[blue]Results saved for use with judgy in the final evaluation step.")
 
 
 if __name__ == "__main__":

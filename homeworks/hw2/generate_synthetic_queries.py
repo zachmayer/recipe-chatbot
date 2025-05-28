@@ -67,9 +67,7 @@ def call_llm(messages: list[dict[str, str]], response_format: Any) -> Any:
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            response = completion(
-                model=MODEL_NAME, messages=messages, response_format=response_format
-            )
+            response = completion(model=MODEL_NAME, messages=messages, response_format=response_format)
             return response_format(**json.loads(response.choices[0].message.content))
         except Exception as e:
             if attempt == max_retries - 1:
@@ -270,15 +268,12 @@ def generate_queries_parallel(
     all_queries = []
     query_id = 1
 
-    print(
-        f"Generating {NUM_QUERIES_PER_TUPLE} queries each for {len(dimension_tuples)} dimension tuples..."
-    )
+    print(f"Generating {NUM_QUERIES_PER_TUPLE} queries each for {len(dimension_tuples)} dimension tuples...")
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         # Submit all query generation tasks
         future_to_tuple = {
-            executor.submit(generate_queries_for_tuple, dim_tuple): i
-            for i, dim_tuple in enumerate(dimension_tuples)
+            executor.submit(generate_queries_for_tuple, dim_tuple): i for i, dim_tuple in enumerate(dimension_tuples)
         }
 
         # Process completed generations as they finish
@@ -353,12 +348,8 @@ def main():
     if queries:
         save_queries_to_csv(queries)
         elapsed_time = time.time() - start_time
-        print(
-            f"\nQuery generation completed successfully in {elapsed_time:.2f} seconds."
-        )
-        print(
-            f"Generated {len(queries)} queries from {len(dimension_tuples)} dimension tuples."
-        )
+        print(f"\nQuery generation completed successfully in {elapsed_time:.2f} seconds.")
+        print(f"Generated {len(queries)} queries from {len(dimension_tuples)} dimension tuples.")
     else:
         print("Failed to generate any queries.")
 

@@ -53,9 +53,7 @@ def evaluate_single_trace_for_binary(args: tuple) -> int:
 
     # Format the prompt using string replacement
     formatted_prompt = judge_prompt.replace("__QUERY__", query)
-    formatted_prompt = formatted_prompt.replace(
-        "__DIETARY_RESTRICTION__", dietary_restriction
-    )
+    formatted_prompt = formatted_prompt.replace("__DIETARY_RESTRICTION__", dietary_restriction)
     formatted_prompt = formatted_prompt.replace("__RESPONSE__", response)
 
     try:
@@ -101,14 +99,10 @@ def evaluate_single_trace_for_binary(args: tuple) -> int:
         return 0
 
 
-def run_judge_on_traces(
-    judge_prompt: str, traces: list[dict[str, Any]], max_workers: int = MAX_WORKERS
-) -> list[int]:
+def run_judge_on_traces(judge_prompt: str, traces: list[dict[str, Any]], max_workers: int = MAX_WORKERS) -> list[int]:
     """Run the judge on all traces and return binary predictions using parallel processing."""
 
-    console.print(
-        f"[yellow]Running judge on {len(traces)} traces with {max_workers} workers..."
-    )
+    console.print(f"[yellow]Running judge on {len(traces)} traces with {max_workers} workers...")
 
     # Prepare tasks for parallel processing
     tasks = [(trace, judge_prompt) for trace in traces]
@@ -118,10 +112,7 @@ def run_judge_on_traces(
     # Use ThreadPoolExecutor for parallel evaluation
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all tasks
-        future_to_task = {
-            executor.submit(evaluate_single_trace_for_binary, task): task
-            for task in tasks
-        }
+        future_to_task = {executor.submit(evaluate_single_trace_for_binary, task): task for task in tasks}
 
         # Process completed tasks with progress tracking
         with console.status("[yellow]Evaluating traces in parallel...") as status:
@@ -133,9 +124,7 @@ def run_judge_on_traces(
                 predictions.append(result)
                 completed += 1
 
-                status.update(
-                    f"[yellow]Evaluated {completed}/{total} traces ({completed / total * 100:.1f}%)"
-                )
+                status.update(f"[yellow]Evaluated {completed}/{total} traces ({completed / total * 100:.1f}%)")
 
     console.print(f"[green]Completed parallel evaluation of {len(predictions)} traces")
     return predictions
@@ -189,26 +178,16 @@ def save_final_results(
     console.print(f"[green]Saved final results to {results_path}")
 
 
-def print_interpretation(
-    theta_hat: float, lower_bound: float, upper_bound: float, raw_success_rate: float
-) -> None:
+def print_interpretation(theta_hat: float, lower_bound: float, upper_bound: float, raw_success_rate: float) -> None:
     """Print interpretation of results."""
 
     console.print("\n[bold]Final Results:")
     console.print("=" * 30)
 
-    console.print(
-        f"[blue]Raw Observed Success Rate: {raw_success_rate:.3f} ({raw_success_rate * 100:.1f}%)"
-    )
-    console.print(
-        f"[green]Corrected Success Rate: {theta_hat:.3f} ({theta_hat * 100:.1f}%)"
-    )
-    console.print(
-        f"[yellow]95% Confidence Interval: [{lower_bound:.3f}, {upper_bound:.3f}]"
-    )
-    console.print(
-        f"[yellow]                        [{lower_bound * 100:.1f}%, {upper_bound * 100:.1f}%]"
-    )
+    console.print(f"[blue]Raw Observed Success Rate: {raw_success_rate:.3f} ({raw_success_rate * 100:.1f}%)")
+    console.print(f"[green]Corrected Success Rate: {theta_hat:.3f} ({theta_hat * 100:.1f}%)")
+    console.print(f"[yellow]95% Confidence Interval: [{lower_bound:.3f}, {upper_bound:.3f}]")
+    console.print(f"[yellow]                        [{lower_bound * 100:.1f}%, {upper_bound * 100:.1f}%]")
 
     correction_magnitude = abs(raw_success_rate - theta_hat)
     console.print(

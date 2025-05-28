@@ -23,10 +23,10 @@ dev = [
 # Ruff (modern unified config)
 # --------------------------------------------------------------------
 [tool.ruff]
-target-version = "py312"            # match the line above
-line-length    = 88                 # Black default
+target-version = "py312"
+line-length    = 120
 
-[tool.ruff.format]                  # Black-style formatter
+[tool.ruff.format]
 quote-style  = "double"
 indent-style = "space"
 

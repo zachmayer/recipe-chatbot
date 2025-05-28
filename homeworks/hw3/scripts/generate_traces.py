@@ -94,9 +94,7 @@ def generate_multiple_traces_per_query(
     # Use ThreadPoolExecutor for parallel processing
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all tasks
-        future_to_task = {
-            executor.submit(generate_trace_with_id, task): task for task in tasks
-        }
+        future_to_task = {executor.submit(generate_trace_with_id, task): task for task in tasks}
 
         # Process completed tasks with progress tracking
         with console.status("[yellow]Generating traces in parallel...") as status:
@@ -111,12 +109,8 @@ def generate_multiple_traces_per_query(
                 if completed % 100 == 0:
                     # Display the trace just generated for verification
                     panel_content = Text()
-                    panel_content.append(
-                        f"Trace ID: {trace['trace_id']}\n", style="bold magenta"
-                    )
-                    panel_content.append(
-                        f"Query ID: {trace['query_id']}\n", style="bold cyan"
-                    )
+                    panel_content.append(f"Trace ID: {trace['trace_id']}\n", style="bold magenta")
+                    panel_content.append(f"Query ID: {trace['query_id']}\n", style="bold cyan")
                     panel_content.append(
                         f"Dietary Restriction: {trace['dietary_restriction']}\n",
                         style="bold yellow",
@@ -150,9 +144,7 @@ def generate_multiple_traces_per_query(
                         )
                     )
 
-                status.update(
-                    f"[yellow]Generated {completed}/{total} traces ({completed / total * 100:.1f}%)"
-                )
+                status.update(f"[yellow]Generated {completed}/{total} traces ({completed / total * 100:.1f}%)")
 
     console.print(f"[green]Completed parallel generation of {len(all_traces)} traces")
     return all_traces

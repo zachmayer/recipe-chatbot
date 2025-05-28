@@ -65,25 +65,16 @@ def run_bulk_test(csv_path: Path, num_workers: int = MAX_WORKERS) -> None:
     with csv_path.open("r", newline="", encoding="utf-8") as csv_file:
         reader = csv.DictReader(csv_file)
         # Expects columns 'id' and 'query'
-        input_data: list[dict[str, str]] = [
-            row for row in reader if row.get("id") and row.get("query")
-        ]
+        input_data: list[dict[str, str]] = [row for row in reader if row.get("id") and row.get("query")]
 
     if not input_data:
-        raise ValueError(
-            "No valid data (with 'id' and 'query') found in the provided CSV file."
-        )
+        raise ValueError("No valid data (with 'id' and 'query') found in the provided CSV file.")
 
     console = Console()
     results_data: list[tuple[str, str, str]] = []  # Will store (id, query, response)
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
-        future_to_data = {
-            executor.submit(process_query_sync, item["id"], item["query"]): item
-            for item in input_data
-        }
-        console.print(
-            f"[bold blue]Submitting {len(input_data)} queries to the executor...[/bold blue]"
-        )
+        future_to_data = {executor.submit(process_query_sync, item["id"], item["query"]): item for item in input_data}
+        console.print(f"[bold blue]Submitting {len(input_data)} queries to the executor...[/bold blue]")
         for i, future in enumerate(as_completed(future_to_data)):
             item_data = future_to_data[future]
             item_id = item_data["id"]
@@ -123,9 +114,7 @@ def run_bulk_test(csv_path: Path, num_workers: int = MAX_WORKERS) -> None:
                         border_style="red",
                     )
                 )
-                results_data.append(
-                    (item_id, item_query, f"Exception during processing: {str(exc)}")
-                )
+                results_data.append((item_id, item_query, f"Exception during processing: {str(exc)}"))
         console.print("[bold blue]All queries processed.[/bold blue]")
 
     timestamp = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -136,9 +125,7 @@ def run_bulk_test(csv_path: Path, num_workers: int = MAX_WORKERS) -> None:
         writer.writerow(["id", "query", "response"])
         writer.writerows(results_data)
 
-    console.print(
-        f"[bold green]Saved {len(results_data)} results to {str(out_path)}[/bold green]"
-    )
+    console.print(f"[bold green]Saved {len(results_data)} results to {str(out_path)}[/bold green]")
 
 
 if __name__ == "__main__":

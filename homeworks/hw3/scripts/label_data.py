@@ -69,14 +69,10 @@ def load_traces(csv_path: str) -> list[dict[str, Any]]:
     return df.to_dict("records")
 
 
-def get_labeling_response(
-    query: str, dietary_restriction: str, response: str
-) -> dict[str, Any] | None:
+def get_labeling_response(query: str, dietary_restriction: str, response: str) -> dict[str, Any] | None:
     """Get labeling response from GPT-4o."""
     try:
-        prompt = LABELING_PROMPT.format(
-            query=query, dietary_restriction=dietary_restriction, response=response
-        )
+        prompt = LABELING_PROMPT.format(query=query, dietary_restriction=dietary_restriction, response=response)
 
         completion = litellm.completion(
             model="gpt-4o",
@@ -103,9 +99,7 @@ def get_labeling_response(
             result = json.loads(json_text)
             return result
         except json.JSONDecodeError:
-            console.print(
-                f"[yellow]Warning: Could not parse JSON response: {response_text}"
-            )
+            console.print(f"[yellow]Warning: Could not parse JSON response: {response_text}")
             return None
 
     except Exception as e:
@@ -133,9 +127,7 @@ def label_single_trace(trace: dict[str, Any]) -> dict[str, Any]:
         )
     else:
         labeled_trace = trace.copy()
-        labeled_trace.update(
-            {"label": None, "reasoning": None, "confidence": None, "labeled": False}
-        )
+        labeled_trace.update({"label": None, "reasoning": None, "confidence": None, "labeled": False})
 
     return labeled_trace
 
@@ -155,15 +147,10 @@ def label_traces(
     # Use ThreadPoolExecutor for parallel labeling
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all labeling tasks
-        future_to_trace = {
-            executor.submit(label_single_trace, trace): trace
-            for trace in sampled_traces
-        }
+        future_to_trace = {executor.submit(label_single_trace, trace): trace for trace in sampled_traces}
 
         # Process completed tasks with progress tracking
-        with console.status(
-            "[yellow]Labeling traces with GPT-4o in parallel..."
-        ) as status:
+        with console.status("[yellow]Labeling traces with GPT-4o in parallel...") as status:
             completed = 0
             total = len(sampled_traces)
 
@@ -172,9 +159,7 @@ def label_traces(
                 labeled_traces.append(labeled_trace)
                 completed += 1
 
-                status.update(
-                    f"[yellow]Labeled {completed}/{total} traces ({completed / total * 100:.1f}%)"
-                )
+                status.update(f"[yellow]Labeled {completed}/{total} traces ({completed / total * 100:.1f}%)")
 
     console.print(f"[green]Completed parallel labeling of {len(labeled_traces)} traces")
     return labeled_traces
@@ -187,16 +172,12 @@ def balance_labels(
 ) -> list[dict[str, Any]]:
     """Balance the dataset to have roughly equal positive and negative examples."""
     # Filter successfully labeled traces
-    valid_traces = [
-        t for t in labeled_traces if t["labeled"] and t["label"] in ["PASS", "FAIL"]
-    ]
+    valid_traces = [t for t in labeled_traces if t["labeled"] and t["label"] in ["PASS", "FAIL"]]
 
     pass_traces = [t for t in valid_traces if t["label"] == "PASS"]
     fail_traces = [t for t in valid_traces if t["label"] == "FAIL"]
 
-    console.print(
-        f"[blue]Available traces: {len(pass_traces)} PASS, {len(fail_traces)} FAIL"
-    )
+    console.print(f"[blue]Available traces: {len(pass_traces)} PASS, {len(fail_traces)} FAIL")
 
     # Sample to get balanced dataset
     selected_pass = random.sample(pass_traces, min(target_positive, len(pass_traces)))
@@ -205,9 +186,7 @@ def balance_labels(
     balanced_traces = selected_pass + selected_fail
     random.shuffle(balanced_traces)
 
-    console.print(
-        f"[green]Balanced dataset: {len(selected_pass)} PASS, {len(selected_fail)} FAIL"
-    )
+    console.print(f"[green]Balanced dataset: {len(selected_pass)} PASS, {len(selected_fail)} FAIL")
 
     return balanced_traces
 
@@ -241,14 +220,10 @@ def main():
 
     # Label traces with parallel processing
     console.print("[yellow]Labeling traces with GPT-4o using parallel processing...")
-    labeled_traces = label_traces(
-        traces, sample_size=200, max_workers=MAX_WORKERS
-    )  # Label more than needed
+    labeled_traces = label_traces(traces, sample_size=200, max_workers=MAX_WORKERS)  # Label more than needed
 
     # Balance the dataset
-    balanced_traces = balance_labels(
-        labeled_traces, target_positive=75, target_negative=75
-    )
+    balanced_traces = balance_labels(labeled_traces, target_positive=75, target_negative=75)
 
     # Save labeled traces
     output_path = data_dir / "labeled_traces.csv"

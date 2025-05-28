@@ -1,6 +1,6 @@
-from __future__ import annotations
-
 """FastAPI application entry-point for the recipe chatbot."""
+
+from __future__ import annotations
 
 from pathlib import Path
 from typing import Final
@@ -32,26 +32,20 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 class ChatMessage(BaseModel):
     """Schema for a single message in the chat history."""
 
-    role: str = Field(
-        ..., description="Role of the message sender (system, user, or assistant)."
-    )
+    role: str = Field(..., description="Role of the message sender (system, user, or assistant).")
     content: str = Field(..., description="Content of the message.")
 
 
 class ChatRequest(BaseModel):
     """Schema for incoming chat messages."""
 
-    messages: list[ChatMessage] = Field(
-        ..., description="The entire conversation history."
-    )
+    messages: list[ChatMessage] = Field(..., description="The entire conversation history.")
 
 
 class ChatResponse(BaseModel):
     """Schema for the assistant's reply returned to the front-end."""
 
-    messages: list[ChatMessage] = Field(
-        ..., description="The updated conversation history."
-    )
+    messages: list[ChatMessage] = Field(..., description="The updated conversation history.")
 
 
 # -----------------------------------------------------------------------------
@@ -66,9 +60,7 @@ async def chat_endpoint(payload: ChatRequest) -> ChatResponse:
     It proxies the user's message list to the underlying agent and returns the updated list.
     """
     # Convert Pydantic models to simple dicts for the agent
-    request_messages: list[dict[str, str]] = [
-        msg.model_dump() for msg in payload.messages
-    ]
+    request_messages: list[dict[str, str]] = [msg.model_dump() for msg in payload.messages]
 
     try:
         updated_messages_dicts = get_agent_response(request_messages)
@@ -80,9 +72,7 @@ async def chat_endpoint(payload: ChatRequest) -> ChatResponse:
         ) from exc
 
     # Convert dicts back to Pydantic models for the response
-    response_messages: list[ChatMessage] = [
-        ChatMessage(**msg) for msg in updated_messages_dicts
-    ]
+    response_messages: list[ChatMessage] = [ChatMessage(**msg) for msg in updated_messages_dicts]
     return ChatResponse(messages=response_messages)
 
 

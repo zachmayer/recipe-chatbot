@@ -129,9 +129,7 @@ def evaluate_single_trace(args: tuple) -> dict[str, Any]:
 
     # Format the prompt using string replacement
     formatted_prompt = judge_prompt.replace("__QUERY__", query)
-    formatted_prompt = formatted_prompt.replace(
-        "__DIETARY_RESTRICTION__", dietary_restriction
-    )
+    formatted_prompt = formatted_prompt.replace("__DIETARY_RESTRICTION__", dietary_restriction)
     formatted_prompt = formatted_prompt.replace("__RESPONSE__", response)
 
     try:
@@ -198,9 +196,7 @@ def evaluate_judge_on_dev(
     else:
         sampled_traces = dev_traces
 
-    console.print(
-        f"[yellow]Evaluating judge on {len(sampled_traces)} dev traces with {max_workers} workers..."
-    )
+    console.print(f"[yellow]Evaluating judge on {len(sampled_traces)} dev traces with {max_workers} workers...")
 
     # Prepare tasks for parallel processing
     tasks = [(trace, judge_prompt) for trace in sampled_traces]
@@ -210,9 +206,7 @@ def evaluate_judge_on_dev(
     # Use ThreadPoolExecutor for parallel evaluation
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all tasks
-        future_to_task = {
-            executor.submit(evaluate_single_trace, task): task for task in tasks
-        }
+        future_to_task = {executor.submit(evaluate_single_trace, task): task for task in tasks}
 
         # Process completed tasks with progress tracking
         with console.status("[yellow]Evaluating traces in parallel...") as status:
@@ -229,33 +223,15 @@ def evaluate_judge_on_dev(
                         f"[yellow]Warning: Failed to evaluate trace {result['trace_id']}: {result.get('error', 'Unknown error')}"
                     )
 
-                status.update(
-                    f"[yellow]Evaluated {completed}/{total} traces ({completed / total * 100:.1f}%)"
-                )
+                status.update(f"[yellow]Evaluated {completed}/{total} traces ({completed / total * 100:.1f}%)")
 
     console.print(f"[green]Completed parallel evaluation of {len(predictions)} traces")
 
     # Calculate TPR and TNR
-    tp = sum(
-        1
-        for p in predictions
-        if p["true_label"] == "PASS" and p["predicted_label"] == "PASS"
-    )
-    fn = sum(
-        1
-        for p in predictions
-        if p["true_label"] == "PASS" and p["predicted_label"] == "FAIL"
-    )
-    tn = sum(
-        1
-        for p in predictions
-        if p["true_label"] == "FAIL" and p["predicted_label"] == "FAIL"
-    )
-    fp = sum(
-        1
-        for p in predictions
-        if p["true_label"] == "FAIL" and p["predicted_label"] == "PASS"
-    )
+    tp = sum(1 for p in predictions if p["true_label"] == "PASS" and p["predicted_label"] == "PASS")
+    fn = sum(1 for p in predictions if p["true_label"] == "PASS" and p["predicted_label"] == "FAIL")
+    tn = sum(1 for p in predictions if p["true_label"] == "FAIL" and p["predicted_label"] == "FAIL")
+    fp = sum(1 for p in predictions if p["true_label"] == "FAIL" and p["predicted_label"] == "PASS")
 
     tpr = tp / (tp + fn) if (tp + fn) > 0 else 0.0
     tnr = tn / (tn + fp) if (tn + fp) > 0 else 0.0
@@ -294,9 +270,7 @@ def main():
     train_traces = load_data_split(str(train_path))
     dev_traces = load_data_split(str(dev_path))
 
-    console.print(
-        f"[green]Loaded {len(train_traces)} train traces and {len(dev_traces)} dev traces"
-    )
+    console.print(f"[green]Loaded {len(train_traces)} train traces and {len(dev_traces)} dev traces")
 
     # Select few-shot examples randomly
     few_shot_examples = select_few_shot_examples(train_traces)

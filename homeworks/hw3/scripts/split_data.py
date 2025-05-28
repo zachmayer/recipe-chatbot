@@ -31,9 +31,7 @@ def stratified_split(
     """Split traces into train/dev/test sets with stratification by label."""
 
     # Validate ratios
-    assert abs(train_ratio + dev_ratio + test_ratio - 1.0) < 1e-6, (
-        "Ratios must sum to 1.0"
-    )
+    assert abs(train_ratio + dev_ratio + test_ratio - 1.0) < 1e-6, "Ratios must sum to 1.0"
 
     # Convert to DataFrame for easier manipulation
     df = pd.DataFrame(traces)
@@ -96,9 +94,7 @@ def print_split_statistics(
 
     console.print("\n[bold]Data Split Statistics:")
     console.print(f"Total traces: {total_traces}")
-    console.print(
-        f"Train: {len(train_traces)} ({len(train_traces) / total_traces:.1%})"
-    )
+    console.print(f"Train: {len(train_traces)} ({len(train_traces) / total_traces:.1%})")
     console.print(f"Dev: {len(dev_traces)} ({len(dev_traces) / total_traces:.1%})")
     console.print(f"Test: {len(test_traces)} ({len(test_traces) / total_traces:.1%})")
 
@@ -142,9 +138,7 @@ def validate_splits(
     # Check that train set has reasonable diversity
     train_restrictions = set(trace["dietary_restriction"] for trace in train_traces)
     if len(train_restrictions) < 3:
-        console.print(
-            f"[red]Warning: Train set only has {len(train_restrictions)} dietary restrictions"
-        )
+        console.print(f"[red]Warning: Train set only has {len(train_restrictions)} dietary restrictions")
         return False
 
     console.print("[green]Data splits validation passed!")
@@ -201,9 +195,7 @@ def main():
     console.print("\n[bold]Split Rationale:")
     console.print("• Train (15%): Small set for few-shot examples in judge prompt")
     console.print("• Dev (40%): Large set for iterative judge development and tuning")
-    console.print(
-        "• Test (45%): Large set for final unbiased evaluation of judge performance"
-    )
+    console.print("• Test (45%): Large set for final unbiased evaluation of judge performance")
 
 
 if __name__ == "__main__":
